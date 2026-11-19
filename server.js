@@ -21,6 +21,7 @@ const databaseConfig = {
     port: Number(process.env.MYSQL_PORT) || 3306,
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || '',
+    ssl: { rejectUnauthorized: true }, // Tambahkan baris ini untuk TiDB Cloud
     dateStrings: true,
     charset: 'utf8mb4'
 };

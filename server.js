@@ -21,7 +21,7 @@ const databaseConfig = {
     port: Number(process.env.MYSQL_PORT) || 3306,
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || '',
-    ssl: { rejectUnauthorized: true }, // Tambahkan baris ini untuk TiDB Cloud
+    ssl: process.env.MYSQL_HOST && process.env.MYSQL_HOST !== '127.0.0.1' ? { rejectUnauthorized: true } : undefined,
     dateStrings: true,
     charset: 'utf8mb4'
 };
@@ -434,6 +434,14 @@ app.delete('/api/tasks/:id', async(req, res, next) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Kumpul berjalan di http://localhost:${PORT} (database: ${DATABASE_NAME})`);
+// Global Error Handler agar server SELALU membalas dalam format JSON
+app.use((err, _req, res, _next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({
+        error: err.sqlMessage || err.message || 'Terjadi kesalahan internal pada server.'
+    });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Kumpul berjalan di port ${PORT} (database: ${DATABASE_NAME})`);
 });

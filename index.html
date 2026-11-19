@@ -244,8 +244,16 @@
                     <input id="taskTitle" name="title" type="text" required placeholder="Contoh: Laporan Praktikum 1">
                 </label>
                 <label class="form-field">Mata kuliah
-                    <input id="taskCourse" name="course" type="text" required placeholder="Contoh: Pemrograman Web">
-                </label>
+    <select id="taskCourse" name="course" required style="padding:10px; border-radius:10px; border:1px solid #d1d5db; width:100%;">
+        <option value="">-- Pilih Mata Kuliah --</option>
+        <option value="Analisis dan Desain PL">Analisis dan Desain PL</option>
+        <option value="Pemrograman Web">Pemrograman Web</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Basis Data">Basis Data</option>
+        <option value="Jaringan Komputer">Jaringan Komputer</option>
+        <option value="Kecerdasan Buatan">Kecerdasan Buatan</option>
+    </select>
+</label>
                 <label class="form-field">Deadline <span class="optional">(opsional)</span>
                     <input id="taskDeadline" name="deadline" type="datetime-local">
                 </label>
@@ -284,7 +292,17 @@
                     <label class="form-field" style="flex:1;">Jam Mulai <input name="start_time" type="time" required></label>
                     <label class="form-field" style="flex:1;">Jam Selesai <input name="end_time" type="time" required></label>
                 </div>
-                <label class="form-field">Mata Kuliah <input name="course" type="text" required placeholder="Contoh: Data Science"></label>
+                <label class="form-field">Mata Kuliah
+    <select name="course" required style="padding:10px; border-radius:10px; border:1px solid #d1d5db; width:100%;">
+        <option value="">-- Pilih Mata Kuliah --</option>
+        <option value="Analisis dan Desain PL">Analisis dan Desain PL</option>
+        <option value="Pemrograman Web">Pemrograman Web</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Basis Data">Basis Data</option>
+        <option value="Jaringan Komputer">Jaringan Komputer</option>
+        <option value="Kecerdasan Buatan">Kecerdasan Buatan</option>
+    </select>
+</label>
                 <label class="form-field">Ruangan / Link <input name="room" type="text" placeholder="Contoh: Lab Komputer 2"></label>
                 <label class="form-field">Dosen / Guru <input name="lecturer" type="text" placeholder="Nama Pengampu"></label>
                 <div class="modal-actions">
@@ -378,8 +396,16 @@
                     </select>
                 </label>
                 <label class="form-field" id="regCourseField" hidden>Mata Kuliah yang Diampu <span class="optional">(Wajib untuk Guru)</span>
-                    <input name="assigned_course" id="regCourseInput" type="text" placeholder="Contoh: Pemrograman Web">
-                </label>
+    <select name="assigned_course" id="regCourseInput" style="padding:10px; border-radius:10px; border:1px solid #d1d5db; width:100%;">
+        <option value="">-- Pilih Mata Kuliah --</option>
+        <option value="Analisis dan Desain PL">Analisis dan Desain PL</option>
+        <option value="Pemrograman Web">Pemrograman Web</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Basis Data">Basis Data</option>
+        <option value="Jaringan Komputer">Jaringan Komputer</option>
+        <option value="Kecerdasan Buatan">Kecerdasan Buatan</option>
+    </select>
+</label>
                 <div class="modal-actions">
                     <button class="primary-button" type="submit" style="width:100%; justify-content:center;">Daftar & Masuk</button>
                 </div>

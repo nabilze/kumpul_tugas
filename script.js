@@ -319,6 +319,46 @@ async function loadTasks() {
     renderTasks();
 }
 
+function renderDeadlineHTML(deadlineIso) {
+    if (!deadlineIso) {
+        return `<div class="task-deadline"><span class="deadline-label">DEADLINE</span><span class="deadline-time no-deadline">Belum ditentukan</span></div>`;
+    }
+    const deadlineDate = new Date(deadlineIso);
+    const diff = deadlineDate.getTime() - Date.now();
+    const formattedDate = new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(deadlineDate);
+
+    const mins = Math.floor(Math.abs(diff) / 60000);
+    const days = Math.floor(mins / 1440);
+    const hours = Math.floor((mins % 1440) / 60);
+    const remMins = mins % 60;
+    const durationText = days ? `${days} hari ${hours} jam` : (hours ? `${hours} jam ${remMins} menit` : `${Math.max(remMins, 1)} menit`);
+
+    let statusClass = '';
+    let countdownText = `${durationText} lagi`;
+    if (diff < 0) {
+        statusClass = 'overdue';
+        countdownText = `Terlambat ${durationText}`;
+    } else if (diff <= 86400000) {
+        statusClass = 'soon';
+    }
+
+    return `
+        <div class="task-deadline">
+            <span class="deadline-label">DEADLINE</span>
+            <time class="deadline-time ${statusClass}">
+                <span>${formattedDate}</span>
+                <span class="countdown ${statusClass}">${countdownText}</span>
+            </time>
+        </div>
+    `;
+}
+
 function renderTasks() {
     const grid = document.getElementById('taskGrid');
 
@@ -369,6 +409,8 @@ function renderTasks() {
             <p class="task-file" style="margin:6px 0; font-size:0.85rem;">
                 ${task.originalName ? `📎 ${escapeHtml(task.originalName)}` : '<i>Belum ada lampiran file</i>'}
             </p>
+
+            ${renderDeadlineHTML(task.deadline)}
 
             ${task.grade !== null && task.grade !== undefined ? `
                 <div class="grade-box">

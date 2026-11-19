@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>Kumpul — Workspace Akademik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tambahan gaya untuk tab halaman, jadwal & role badge */
+        
+        .page-view[hidden] {
+            display: none !important;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+        
+        .role-badge.guru {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .schedule-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        
+        .schedule-item {
+            padding: 10px;
+            border-radius: 10px;
+            background: #f8fafc;
+            margin-top: 10px;
+            border-left: 3px solid #6366f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .grade-box {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            font-size: 0.85rem;
+            color: #065f46;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .auth-tab.active {
+            background: #111827;
+            color: #fff;
+            border-color: #111827;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="#" aria-label="Kumpul, beranda">
+                <span class="brand-mark">K</span>
+                <span>kumpul<span class="brand-dot">.</span></span>
+            </a>
+            <div class="sidebar-label">NAVIGASI</div>
+            <nav class="side-nav" aria-label="Navigasi utama">
+                <button class="side-link active" type="button" data-page="page-tasks"><span class="nav-icon">▤</span> Tugas & Penilaian</button>
+                <button class="side-link" type="button" data-page="page-schedule"><span class="nav-icon">◷</span> Jadwal Harian</button>
+                <button class="side-link" type="button" data-page="page-materials"><span class="nav-icon">📖</span> Materi Kuliah</button>
+                <a class="side-link" href="http://localhost/porto/"><span class="nav-icon">⌂</span> Portofolio</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-user" id="userProfileBox" style="cursor: pointer;" title="Klik untuk ganti akun / login">
+                    <div class="avatar" id="userAvatar">?</div>
+                    <div>
+                        <strong id="sidebarUserName">Belum Login</strong>
+                        <span id="sidebarUserRole">Klik untuk masuk</span>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="secondary-button" style="width: 100%; margin-top: 10px; display: none;" type="button">Keluar Akun</button>
+            </div>
+        </aside>
+
+        <main class="main-content" id="dashboard">
+            <header class="topbar">
+                <div class="breadcrumb">Ruang belajar <span>/</span> <strong id="currentBreadcrumb">Tugas</strong></div>
+                <div class="topbar-actions">
+                    <span id="activeRoleBadge" class="role-badge">Tamu</span>
+                    <span class="live-clock" id="liveClock" aria-live="off"></span>
+                    <button class="notification-button" id="openAuthModalBtn" type="button">
+                        <span>👤</span> <span id="authBtnText">Masuk / Daftar</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ========================================== -->
+            <!-- PAGE 1: TUGAS & PENILAIAN                  -->
+            <!-- ========================================== -->
+            <div id="page-tasks" class="page-view">
+                <section class="welcome-section">
+                    <div>
+                        <div class="eyebrow"><span class="eyebrow-dot"></span> WORKSPACE TUGAS</div>
+                        <h1 id="welcomeHeadline">Semua tugas,<br><span>dalam kendali.</span></h1>
+                        <p class="welcome-copy" id="welcomeSubcopy">Kelola tugas kuliahmu, unggah progres, dan pantau hasil penilaian dosen.</p>
+                    </div>
+                </section>
+
+                <section class="stats-grid" aria-label="Ringkasan tugas">
+                    <article class="stat-card">
+                        <span class="stat-icon icon-lilac">▤</span>
+                        <span class="stat-label">Total tugas</span>
+                        <strong class="stat-value" id="totalCount">—</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon icon-amber">◷</span>
+                        <span class="stat-label">Belum selesai</span>
+                        <strong class="stat-value" id="pendingCount">—</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon icon-green">✓</span>
+                        <span class="stat-label">Sudah selesai</span>
+                        <strong class="stat-value" id="completedCount">—</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-icon icon-rose">!</span>
+                        <span class="stat-label">Mendekati deadline</span>
+                        <strong class="stat-value" id="urgentCount">—</strong>
+                    </article>
+                </section>
+
+                <section class="tasks-section" id="tasks">
+                    <div class="section-heading">
+                        <div>
+                            <div class="eyebrow">DAFTAR KERJA</div>
+                            <h2 id="taskSectionTitle">Tugasmu</h2>
+                        </div>
+                        <button class="primary-button" id="openTaskModal" type="button"><span>＋</span> Tambah tugas</button>
+                    </div>
+
+                    <div class="task-toolbar">
+                        <div class="filter-tabs" role="group">
+                            <button class="filter-tab active" type="button" data-filter="ALL">Semua</button>
+                            <button class="filter-tab" type="button" data-filter="BELUM_SELESAI">Belum selesai</button>
+                            <button class="filter-tab" type="button" data-filter="SELESAI">Selesai</button>
+                        </div>
+                        <label class="search-box">
+                            <span>⌕</span>
+                            <input id="taskSearch" type="search" placeholder="Cari tugas / mahasiswa...">
+                        </label>
+                    </div>
+
+                    <div class="task-grid" id="taskGrid"></div>
+                </section>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PAGE 2: JADWAL HARIAN                      -->
+            <!-- ========================================== -->
+            <div id="page-schedule" class="page-view" hidden>
+                <div class="section-heading">
+                    <div>
+                        <div class="eyebrow">AGENDA MINGGUAN</div>
+                        <h2>Jadwal Kuliah Harian</h2>
+                    </div>
+                    <button class="primary-button" id="openScheduleModal" type="button"><span>＋</span> Tambah Jadwal</button>
+                </div>
+                <div class="schedule-grid" id="scheduleGrid"></div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PAGE 3: MATERI KULIAH                      -->
+            <!-- ========================================== -->
+            <div id="page-materials" class="page-view" hidden>
+                <div class="section-heading">
+                    <div>
+                        <div class="eyebrow">BAHAN AJAR</div>
+                        <h2>Materi Perkuliahan</h2>
+                    </div>
+                    <!-- Tombol ini hanya muncul jika user adalah GURU -->
+                    <button class="primary-button" id="openMaterialModal" type="button" hidden><span>＋</span> Upload Materi</button>
+                </div>
+                <div class="task-toolbar">
+                    <label class="search-box" style="width: 100%; max-width: 400px;">
+                        <span>⌕</span>
+                        <input id="materialSearch" type="search" placeholder="Cari materi atau mata kuliah...">
+                    </label>
+                </div>
+                <div class="task-grid" id="materialGrid"></div>
+            </div>
+
+            <footer class="page-footer"><span>kumpul<span class="brand-dot">.</span></span> Biar tugas rapi, pikiran lebih lega.</footer>
+        </main>
+    </div>
+
+    <!-- MODAL 1: TAMBAH TUGAS (MAHASISWA) -->
+    <div class="modal-overlay" id="taskModal" hidden>
+        <section class="modal-card">
+            <div class="modal-heading">
+                <div><span class="eyebrow">TUGAS BARU</span>
+                    <h2>Tambah tugas</h2>
+                </div>
+                <button class="close-button" data-close-modal="taskModal" type="button">×</button>
+            </div>
+            <form id="taskForm">
+                <label class="form-field">Nama tugas
+                    <input id="taskTitle" name="title" type="text" required placeholder="Contoh: Laporan Praktikum 1">
+                </label>
+                <label class="form-field">Mata kuliah
+                    <input id="taskCourse" name="course" type="text" required placeholder="Contoh: Pemrograman Web">
+                </label>
+                <label class="form-field">Deadline <span class="optional">(opsional)</span>
+                    <input id="taskDeadline" name="deadline" type="datetime-local">
+                </label>
+                <label class="form-field">Lampiran tugas <span class="optional">(opsional)</span>
+                    <input id="taskFile" name="taskFile" type="file">
+                </label>
+                <div class="modal-actions">
+                    <button class="secondary-button" data-close-modal="taskModal" type="button">Batal</button>
+                    <button class="primary-button" type="submit">Simpan tugas</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- MODAL 2: TAMBAH JADWAL HARIAN -->
+    <div class="modal-overlay" id="scheduleModal" hidden>
+        <section class="modal-card">
+            <div class="modal-heading">
+                <div><span class="eyebrow">AGENDA BARU</span>
+                    <h2>Tambah Jadwal Harian</h2>
+                </div>
+                <button class="close-button" data-close-modal="scheduleModal" type="button">×</button>
+            </div>
+            <form id="scheduleForm">
+                <label class="form-field">Hari
+                    <select name="day_of_week" required style="padding:10px; border-radius:10px; border:1px solid #d1d5db;">
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                        <option value="Sabtu">Sabtu</option>
+                    </select>
+                </label>
+                <div style="display:flex; gap:10px;">
+                    <label class="form-field" style="flex:1;">Jam Mulai <input name="start_time" type="time" required></label>
+                    <label class="form-field" style="flex:1;">Jam Selesai <input name="end_time" type="time" required></label>
+                </div>
+                <label class="form-field">Mata Kuliah <input name="course" type="text" required placeholder="Contoh: Data Science"></label>
+                <label class="form-field">Ruangan / Link <input name="room" type="text" placeholder="Contoh: Lab Komputer 2"></label>
+                <label class="form-field">Dosen / Guru <input name="lecturer" type="text" placeholder="Nama Pengampu"></label>
+                <div class="modal-actions">
+                    <button class="secondary-button" data-close-modal="scheduleModal" type="button">Batal</button>
+                    <button class="primary-button" type="submit">Simpan Jadwal</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- MODAL 3: UPLOAD MATERI (KHUSUS GURU) -->
+    <div class="modal-overlay" id="materialModal" hidden>
+        <section class="modal-card">
+            <div class="modal-heading">
+                <div><span class="eyebrow">BAHAN AJAR</span>
+                    <h2>Upload Materi Kuliah</h2>
+                </div>
+                <button class="close-button" data-close-modal="materialModal" type="button">×</button>
+            </div>
+            <form id="materialForm">
+                <p class="form-hint" id="materialCourseInfo" style="font-weight:600; color:#4f46e5; margin-bottom:10px;"></p>
+                <label class="form-field">Judul Materi <input name="title" type="text" required placeholder="Contoh: Pertemuan 3 - Normalisasi Database"></label>
+                <label class="form-field">Deskripsi / Catatan <textarea name="description" rows="3" style="padding:10px; border-radius:10px; border:1px solid #d1d5db;" placeholder="Ringkasan materi atau instruksi..."></textarea></label>
+                <label class="form-field">File Materi (PDF/PPT/ZIP) <input name="materialFile" type="file"></label>
+                <div class="modal-actions">
+                    <button class="secondary-button" data-close-modal="materialModal" type="button">Batal</button>
+                    <button class="primary-button" type="submit">Publikasikan Materi</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- MODAL 4: PENILAIAN TUGAS (KHUSUS GURU) -->
+    <div class="modal-overlay" id="gradeModal" hidden>
+        <section class="modal-card">
+            <div class="modal-heading">
+                <div><span class="eyebrow">EVALUASI</span>
+                    <h2>Beri Nilai Tugas</h2>
+                </div>
+                <button class="close-button" data-close-modal="gradeModal" type="button">×</button>
+            </div>
+            <form id="gradeForm">
+                <input type="hidden" id="gradeTaskId">
+                <p id="gradeStudentInfo" style="margin-bottom:12px; font-weight:600;"></p>
+                <label class="form-field">Nilai (0 - 100)
+                    <input id="gradeScoreInput" type="number" min="0" max="100" required placeholder="Contoh: 90">
+                </label>
+                <label class="form-field">Catatan / Feedback Guru
+                    <textarea id="gradeFeedbackInput" rows="3" style="padding:10px; border-radius:10px; border:1px solid #d1d5db;" placeholder="Komentar hasil pekerjaan mahasiswa..."></textarea>
+                </label>
+                <div class="modal-actions">
+                    <button class="secondary-button" data-close-modal="gradeModal" type="button">Batal</button>
+                    <button class="primary-button" type="submit">Simpan Nilai</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <!-- MODAL 5: LOGIN / REGISTER AKUN (MAHASISWA & GURU) -->
+    <div class="modal-overlay" id="authModal" hidden>
+        <section class="modal-card">
+            <div class="modal-heading">
+                <div><span class="eyebrow">AKSES PENGGUNA</span>
+                    <h2 id="authModalTitle">Masuk Akun</h2>
+                </div>
+                <button class="close-button" data-close-modal="authModal" type="button">×</button>
+            </div>
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" id="tabLogin">Masuk (Login)</button>
+                <button type="button" class="auth-tab" id="tabRegister">Daftar Baru</button>
+            </div>
+
+            <!-- Form Login -->
+            <form id="loginForm">
+                <label class="form-field">Username <input name="username" type="text" required></label>
+                <label class="form-field">Password <input name="password" type="password" required></label>
+                <div class="modal-actions">
+                    <button class="primary-button" type="submit" style="width:100%; justify-content:center;">Masuk</button>
+                </div>
+            </form>
+
+            <!-- Form Register -->
+            <form id="registerForm" hidden>
+                <label class="form-field">Nama Lengkap <input name="name" type="text" required placeholder="Contoh: Budi Santoso / Pak Ahmad"></label>
+                <label class="form-field">Username <input name="username" type="text" required></label>
+                <label class="form-field">Password <input name="password" type="password" required></label>
+                <label class="form-field">Peran (Role)
+                    <select id="regRoleSelect" name="role" style="padding:10px; border-radius:10px; border:1px solid #d1d5db;">
+                        <option value="MAHASISWA">Mahasiswa</option>
+                        <option value="GURU">Guru / Dosen Pengampu</option>
+                    </select>
+                </label>
+                <label class="form-field" id="regCourseField" hidden>Mata Kuliah yang Diampu <span class="optional">(Wajib untuk Guru)</span>
+                    <input name="assigned_course" id="regCourseInput" type="text" placeholder="Contoh: Pemrograman Web">
+                </label>
+                <div class="modal-actions">
+                    <button class="primary-button" type="submit" style="width:100%; justify-content:center;">Daftar & Masuk</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="toast-region" id="toastRegion"></div>
+    <script src="script.js"></script>
+</body>
+
+</html>
